@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.demo.security.model;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,6 +18,7 @@ public class JWTAuthentication implements Authentication {
     private String credentials;
     private DecodedJWT details;
     private String principal;
+    private JWTVerificationException error;
 
     private List<GrantedAuthority> authorities = List.of();
 
@@ -26,12 +28,18 @@ public class JWTAuthentication implements Authentication {
             principal = jwt.getSubject();
             credentials = jwt.getSignature();
             if (jwt.getAudience() != null) {
-                authorities = Stream.concat(jwt.getAudience()
-                        .stream(), Stream.of("ANY"))
-                        .map(s -> new SimpleGrantedAuthority("ROLE_" + s))
+                authorities = Stream.concat(
+                        jwt.getAudience()
+                                .stream()
+                                .map(s -> new SimpleGrantedAuthority("ROLE_" + s)),
+                        Stream.of(new SimpleGrantedAuthority("ROLE_ANY")))
                         .collect(Collectors.toList());
             }
         }
+    }
+
+    public JWTAuthentication(JWTVerificationException e) {
+        this.error = e;
     }
 
     public boolean isAuthenticated() {

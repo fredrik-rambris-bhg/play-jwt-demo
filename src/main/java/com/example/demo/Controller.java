@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.security.model.JWTAuthentication;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
